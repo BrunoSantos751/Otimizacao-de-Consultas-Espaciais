@@ -155,7 +155,6 @@ Este projeto foi desenvolvido para fins acadêmicos e de pesquisa.
 
 ---
 
-**Autor**: Bruno  
 **Projeto**: Otimização de Consultas Espaciais  
-**Data**: 2024
+**Data**: 2025
 
