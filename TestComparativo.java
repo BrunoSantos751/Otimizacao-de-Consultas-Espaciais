@@ -4,7 +4,7 @@ public class TestComparativo {
 
     static Random rnd = new Random(12345);
     // Configurações Globais
-    static final int REPS = 100; // Aumentado para 100 repetições
+    static final int REPS = 100; 
     static final int[] SIZES = { 10000, 50000, 100000, 250000, 500000, 1000000, 2000000, 5000000, 10000000 }; // Cenários de N
     static final double SPACE = 1000.0;
 
@@ -25,7 +25,7 @@ public class TestComparativo {
         // Construir estruturas
         Linear linear = new Linear();
         QuadTree quad = new QuadTree(new Rectangle(0, 0, space, space));
-        RStarTree rstar = new RStarTree(16); // Otimizado: maxEntries reduzido de 100 para 16
+        RStarTree rstar = new RStarTree(16); 
 
         for (Point p : pts) {
             linear.insert(p);
@@ -117,7 +117,10 @@ public class TestComparativo {
     }
 
     static Rectangle gerarQueryAleatoria(double space, double frac, List<Point> pontos, boolean cluster) {
-        double size = space * frac;
+        double totalArea = space * space;
+        double queryArea = totalArea * frac;
+        double size = Math.sqrt(queryArea); 
+
         if (cluster && !pontos.isEmpty()) {
             Point p = pontos.get(rnd.nextInt(pontos.size()));
             double x = Math.max(0, Math.min(p.x - size/2.0, space - size));

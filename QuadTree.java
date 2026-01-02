@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuadTree {
-    private static final int CAPACITY = 16; // Aumentado para reduzir profundidade
+    private static final int CAPACITY = 16; 
     private static final int MAX_DEPTH = 12;
 
     private final Rectangle boundary;

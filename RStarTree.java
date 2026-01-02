@@ -148,21 +148,34 @@ public class RStarTree {
     }
 
 private Node split(Node node) {
-    // Escolhe eixo de split
-    boolean chooseByX = chooseSplitAxis(node);
+    // 1. Avaliar eixo X
+    List<Entry> entriesX = new ArrayList<>(node.entries);
+    entriesX.sort(Comparator.comparingDouble(e -> e.mbr.minX));
+    int splitIndexX = findBestSplitIndex(entriesX, true);
+    double scoreX = calculateSplitScore(entriesX, splitIndexX);
 
-    // Ordena cópia das entries
-    List<Entry> copy = new ArrayList<>(node.entries);
-    copy.sort(chooseByX ? Comparator.comparingDouble(e -> e.mbr.minX)
-                        : Comparator.comparingDouble(e -> e.mbr.minY));
+    // 2. Avaliar eixo Y
+    List<Entry> entriesY = new ArrayList<>(node.entries);
+    entriesY.sort(Comparator.comparingDouble(e -> e.mbr.minY));
+    int splitIndexY = findBestSplitIndex(entriesY, false);
+    double scoreY = calculateSplitScore(entriesY, splitIndexY);
 
-    // Otimização: encontrar melhor ponto de split minimizando overlap
-    int bestSplitIndex = findBestSplitIndex(copy, chooseByX);
-    
-    List<Entry> group1 = new ArrayList<>(copy.subList(0, bestSplitIndex));
-    List<Entry> group2 = new ArrayList<>(copy.subList(bestSplitIndex, copy.size()));
+    // 3. Escolher o melhor eixo (menor score é melhor)
+    List<Entry> bestSortedEntries;
+    int bestSplitIndex;
 
-    // Atribui entries ao nó original e ao novo nó
+    if (scoreX < scoreY) {
+        bestSortedEntries = entriesX;
+        bestSplitIndex = splitIndexX;
+    } else {
+        bestSortedEntries = entriesY;
+        bestSplitIndex = splitIndexY;
+    }
+
+    // 4. Realizar a divisão com o melhor eixo encontrado
+    List<Entry> group1 = new ArrayList<>(bestSortedEntries.subList(0, bestSplitIndex));
+    List<Entry> group2 = new ArrayList<>(bestSortedEntries.subList(bestSplitIndex, bestSortedEntries.size()));
+
     node.entries.clear();
     node.entries.addAll(group1);
     for (Entry e : node.entries) {
@@ -179,6 +192,15 @@ private Node split(Node node) {
     newNode.recalcMBR();
 
     return newNode;
+}
+
+// Método auxiliar necessário para calcular o score sem duplicar código
+private double calculateSplitScore(List<Entry> sortedEntries, int splitIndex) {
+    Rectangle mbr1 = calculateMBR(sortedEntries.subList(0, splitIndex));
+    Rectangle mbr2 = calculateMBR(sortedEntries.subList(splitIndex, sortedEntries.size()));
+    double overlap = calculateOverlap(mbr1, mbr2);
+    double totalArea = mbr1.area() + mbr2.area();
+    return overlap + totalArea * 0.1; // Mesma fórmula do artigo
 }
 
 // Encontra o melhor índice de split minimizando overlap e área total
@@ -223,16 +245,6 @@ private double calculateOverlap(Rectangle a, Rectangle b) {
     double overlapY = Math.max(0, Math.min(a.maxY, b.maxY) - Math.max(a.minY, b.minY));
     return overlapX * overlapY;
 }
-
-    private boolean chooseSplitAxis(Node node) {
-        double minX = Double.POSITIVE_INFINITY, maxX = Double.NEGATIVE_INFINITY;
-        double minY = Double.POSITIVE_INFINITY, maxY = Double.NEGATIVE_INFINITY;
-        for (Entry e : node.entries) {
-            minX = Math.min(minX, e.mbr.minX); maxX = Math.max(maxX, e.mbr.maxX);
-            minY = Math.min(minY, e.mbr.minY); maxY = Math.max(maxY, e.mbr.maxY);
-        }
-        return (maxX - minX) >= (maxY - minY);
-    }
 
     public List<Point> rangeQuery(Rectangle rect) {
         List<Point> out = new ArrayList<>();
