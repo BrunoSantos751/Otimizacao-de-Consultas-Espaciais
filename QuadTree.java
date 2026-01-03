@@ -3,8 +3,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuadTree {
-    private static final int CAPACITY = 16; 
-    private static final int MAX_DEPTH = 12;
+    private static final int CAPACITY = 64; 
+    private static final int MAX_DEPTH = 24;
 
     private final Rectangle boundary;
     private final List<Point> points = new ArrayList<>();

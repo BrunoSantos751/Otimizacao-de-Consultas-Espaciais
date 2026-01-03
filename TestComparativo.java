@@ -25,7 +25,7 @@ public class TestComparativo {
         // Construir estruturas
         Linear linear = new Linear();
         QuadTree quad = new QuadTree(new Rectangle(0, 0, space, space));
-        RStarTree rstar = new RStarTree(16); 
+        RStarTree rstar = new RStarTree(64); 
 
         for (Point p : pts) {
             linear.insert(p);
